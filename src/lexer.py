@@ -20,13 +20,16 @@ class TokenType:
     INT = 16
     FLOAT = 17,
     NEG = 18,
-    STR = 19
+    STR = 19,
+    DOT = 20,
+    TOKENIZE = 21
 
 keywords = {
     "let": { "type": TokenType.LET },
     "quit": { "type": TokenType.QUIT },
     "select": { "type": TokenType.SELECT },
     "load": { "type": TokenType.LOAD },
+    "tokenize": { "type": TokenType.TOKENIZE }
 }
 
 symbols = {
@@ -40,7 +43,8 @@ symbols = {
     "*": { "type": TokenType.MULT },
     "/": { "type": TokenType.DIV },
     "(": { "type": TokenType.OP_PAREN }, 
-    ")": { "type": TokenType.CL_PAREN } 
+    ")": { "type": TokenType.CL_PAREN },
+    ".": { "type": TokenType.DOT } 
 }
 
 def gen_token(command: str, index: int, out: Dict) -> int:
