@@ -18,11 +18,15 @@ class TokenType:
     OP_PAREN = 14
     CL_PAREN = 15
     INT = 16
-    FLOAT = 17,
-    NEG = 18,
-    STR = 19,
-    DOT = 20,
+    FLOAT = 17
+    NEG = 18
+    STR = 19
+    DOT = 20
     TOKENIZE = 21
+    GT = 22
+    LT = 23
+    GTE = 24
+    LTE = 25
 
 keywords = {
     "let": { "type": TokenType.LET },
@@ -44,7 +48,11 @@ symbols = {
     "/": { "type": TokenType.DIV },
     "(": { "type": TokenType.OP_PAREN }, 
     ")": { "type": TokenType.CL_PAREN },
-    ".": { "type": TokenType.DOT } 
+    ".": { "type": TokenType.DOT },
+    ">": { "type": TokenType.GT },
+    "<": { "type": TokenType.LT },
+    ">=": { "type": TokenType.GTE },
+    "<=": { "type": TokenType.LTE },
 }
 
 def gen_token(command: str, index: int, out: Dict) -> int:
@@ -69,6 +77,24 @@ def gen_token(command: str, index: int, out: Dict) -> int:
         else:
             out.append(symbols["!"])
         return next_index 
+    elif begin_chr == '>':
+        next_index = index + 1
+        next_chr = command[next_index] if next_index < len(command) else None
+        if next_chr == '=':
+            out.append(symbols[">="])
+            next_index += 1
+        else:
+            out.append(symbols[">"])
+        return next_index
+    elif begin_chr == '<':
+        next_index = index + 1
+        next_chr = command[next_index] if next_index < len(command) else None
+        if next_chr == '=':
+            out.append(symbols["<="])
+            next_index += 1
+        else:
+            out.append(symbols["<"])
+        return next_index
     elif begin_chr == '"':
         tmp = ""
         tmp_index = index+1

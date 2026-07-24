@@ -1,6 +1,6 @@
 from typing import List, Dict
 from .lexer import TokenType
-from .expression import get_next, pick_token, check_token, build_tree 
+from .expressions.build import get_next, pick_token, check_token, build_tree 
 import json
 
 variables: Dict = {} 
