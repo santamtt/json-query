@@ -1,12 +1,9 @@
 from typing import List, Dict
 from .lexer import TokenType
-from .expression import pick_token, check_token, check_types
+from .expression import get_next, pick_token, check_token, build_tree 
 import json
 
 variables: Dict = {} 
-
-def eval_expr(command: List) -> Dict:
-    return { "success": False, "message": "not implemented yet" }
 
 def load_json(command: List) -> Dict:
 
@@ -37,7 +34,7 @@ def assign(command: List) -> Dict:
         return option_eq
     token_eq = option_eq["token"]    
 
-    option_str: Dict = pick_token(command)
+    option_str: Dict = get_next(command)
     if not option_str["success"]:
         return option_str
     check_next: Dict = option_str["token"]
@@ -48,12 +45,11 @@ def assign(command: List) -> Dict:
             variables[token_id["name"]] = parse["value"]
         else:
             result = parse
-
-    elif check_next["type"] == TokenType.INT or check_next["type"] == TokenType.FLOAT or check_next["type"] == TokenType.ID:
-            result = eval_expr(command)
     else:
-        result = { "success": False, "message": f"""bad assegnation: invalid 
-                  element of type {check_next.TokenType}"""}
+        option_tree = build_tree(command, variables)
+        if option_tree["success"]:
+            variables[token_id["name"]] = 0 
+        result = option_tree
 
     return result 
 
@@ -64,15 +60,15 @@ def print_tokens(command: List) -> Dict:
 def parse_command(command: List) -> Dict:
 
     result: Dict = None
-    first: Dict = command.pop(0)
+    first: Dict = command[0]
     
     if first["type"] == TokenType.LET:
+        command.pop(0)
         result = assign(command)
     elif first["type"] == TokenType.TOKENIZE:
+        command.pop(0)
         result = print_tokens(command)
     else:
-        result = eval_expr(command)
-        if result["success"]:
-            print(result["value"])
+        result = build_tree(command, variables)
 
     return result

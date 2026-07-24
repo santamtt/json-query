@@ -64,7 +64,6 @@ def gen_token(command: str, index: int, out: Dict) -> int:
         next_index = index+1
         next_chr = command[next_index] if next_index < len(command) else None
         if next_chr == '=':
-            print(next_chr)
             out.append(symbols["!="])
             next_index += 1
         else:
