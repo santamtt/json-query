@@ -1,6 +1,7 @@
 from typing import List, Dict
 from .lexer import TokenType
 from .expressions.build import get_next, pick_token, check_token, build_tree 
+from .expressions.evaluate import eval_tree
 import json
 
 variables: Dict = {} 
@@ -48,7 +49,7 @@ def assign(command: List) -> Dict:
     else:
         option_tree = build_tree(command, variables)
         if option_tree["success"]:
-            variables[token_id["name"]] = 0 
+            variables[token_id["name"]] = eval_tree(option_tree) 
         result = option_tree
 
     return result 
@@ -70,5 +71,9 @@ def parse_command(command: List) -> Dict:
         result = print_tokens(command)
     else:
         result = build_tree(command, variables)
-
+        if result["success"]:
+            if not result["is_primary"]:
+                result = eval_tree(result)
+                if result["success"]:
+                    print(result["value"])
     return result
