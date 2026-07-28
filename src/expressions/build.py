@@ -82,58 +82,100 @@ def mult_expr(command: List[Dict], variables: Dict) -> Dict:
     option_left = unary_expr(command, variables)
     if not option_left["success"]:
         return option_left
+    expr: Dict = option_left
 
-    option_op = check_types(command, [TokenType.MULT, TokenType.DIV])
-    if not option_op["success"]:
-        return option_left
-    token_op = option_op["token"] 
-    
-    option_right = unary_expr(command, variables)
-    if not option_right["success"]:
-        return option_right
+    while True:
+        option_op = check_types(command, [
+            TokenType.MULT,
+            TokenType.DIV
+        ])
 
-    return { "success": True, "is_primary": False, "value": { "op": token_op["type"], "left": option_left, "right": option_right } }
+        if not option_op["success"]:
+            break
+        token_op: Dict = option_op["token"]
+
+        option_right: Dict = unary_expr(command, variables)
+        if not option_right["success"]:
+            return option_right
+
+        expr: Dict = { "success": True, "is_primary": False, "value": { "op": token_op["type"], "left": expr, "right": option_right } }
+
+    return expr
 
 
 def add_expr(command: List[Dict], variables: Dict) -> Dict:
     option_left = mult_expr(command, variables)
     if not option_left["success"]:
         return option_left
+    expr: Dict = option_left
 
-    option_op = check_types(command, [TokenType.PLUS, TokenType.MINUS])
-    if not option_op["success"]:
-        return option_left
-    token_op = option_op["token"] 
-    
-    option_right = mult_expr(command, variables)
-    if not option_right["success"]:
-        return option_right
+    while True:
+        option_op = check_types(command, [
+            TokenType.PLUS,
+            TokenType.MINUS
+        ])
 
-    return { "success": True, "is_primary": False, "value": { "op": token_op["type"], "left": option_left, "right": option_right }}
+        if not option_op["success"]:
+            break
+        token_op: Dict = option_op["token"]
 
-def eq_expr(command: List[Dict], variables: Dict) -> Dict:
+        option_right: Dict = mult_expr(command, variables)
+        if not option_right["success"]:
+            return option_right
+
+        expr: Dict = { "success": True, "is_primary": False, "value": { "op": token_op["type"], "left": expr, "right": option_right } }
+
+    return expr 
+
+def comp_expr(command: List[Dict], variables: Dict) -> Dict:
     option_left = add_expr(command, variables)
     if not option_left["success"]:
         return option_left
+    expr:Dict = option_left
 
-    option_op = check_types(command, [
-        TokenType.DOUBLE_EQ, 
-        TokenType.NEQ, 
-        TokenType.GT, 
-        TokenType.LT, 
-        TokenType.GTE, 
-        TokenType.LTE
-    ])
+    while True:
+        option_op = check_types(command, [
+            TokenType.LT,
+            TokenType.LTE,
+            TokenType.GT,
+            TokenType.GTE,
+        ])
 
-    if not option_op["success"]:
+        if not option_op["success"]:
+            break
+        token_op: Dict = option_op["token"]
+
+        option_right: Dict = add_expr(command, variables)
+        if not option_right["success"]:
+            return option_right
+
+        expr: Dict = { "success": True, "is_primary": False, "value": { "op": token_op["type"], "left": expr, "right": option_right } }
+
+    return expr 
+
+def eq_expr(command: List[Dict], variables: Dict) -> Dict:
+    option_left = comp_expr(command, variables)
+    if not option_left["success"]:
         return option_left
-    token_op = option_op["token"] 
-    
-    option_right = add_expr(command, variables)
-    if not option_right["success"]:
-        return option_right
+    expr: Dict = option_left
 
-    return { "success": True, "is_primary": False, "value": { "op": token_op["type"], "left": option_left, "right": option_right } }
+    while True:
+        option_op = check_types(command, [
+            TokenType.DOUBLE_EQ,
+            TokenType.NEQ
+        ])
+
+        if not option_op["success"]:
+            break
+        token_op: Dict = option_op["token"]
+
+        option_right: Dict = comp_expr(command, variables)
+        if not option_right["success"]:
+            return option_right
+
+        expr: Dict = { "success": True, "is_primary": False, "value": { "op": token_op["type"], "left": expr, "right": option_right } }
+
+    return expr 
 
 def build_tree(command: List[Dict], variables: Dict) -> Dict:
     res: Dict = eq_expr(command, variables)
