@@ -49,7 +49,10 @@ def assign(command: List) -> Dict:
     else:
         option_tree = build_tree(command, variables)
         if option_tree["success"]:
-            variables[token_id["name"]] = eval_tree(option_tree) 
+            option_eval = eval_tree(option_tree)
+            if not option_eval["success"]:
+                return option_eval
+            variables[token_id["name"]] = option_eval["value"] 
         result = option_tree
 
     return result 
@@ -72,8 +75,7 @@ def parse_command(command: List) -> Dict:
     else:
         result = build_tree(command, variables)
         if result["success"]:
-            if not result["is_primary"]:
-                result = eval_tree(result)
-                if result["success"]:
-                    print(result["value"])
+            result = eval_tree(result)
+            if result["success"]:
+                print(result["value"])
     return result

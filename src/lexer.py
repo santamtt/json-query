@@ -27,13 +27,21 @@ class TokenType:
     LT = 23
     GTE = 24
     LTE = 25
+    AND = 26
+    OR = 27
+    TRUE = 28
+    FALSE = 29
 
 keywords = {
     "let": { "type": TokenType.LET },
     "quit": { "type": TokenType.QUIT },
     "select": { "type": TokenType.SELECT },
     "load": { "type": TokenType.LOAD },
-    "tokenize": { "type": TokenType.TOKENIZE }
+    "tokenize": { "type": TokenType.TOKENIZE },
+    "and": { "type": TokenType.AND },
+    "or": { "type": TokenType.OR },
+    "true": { "type": TokenType.TRUE },
+    "false": { "type": TokenType.FALSE }
 }
 
 symbols = {
@@ -149,7 +157,7 @@ def gen_token(command: str, index: int, out: Dict) -> int:
 
         while tmp_index < len(command):
             char = command[tmp_index]
-            if not char.isalnum() and char != '-' and char != '_':
+            if not char.isalnum()  and char != '_':
                 break
             tmp += char
             tmp_index += 1

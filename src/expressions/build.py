@@ -45,6 +45,10 @@ def primary(command: List[Dict], variables: Dict) -> Dict:
 
     if token_primary["type"] == TokenType.INT:
         return { "success": True, "is_primary": True, "value": int(token_primary["value"]) }
+    elif token_primary["type"] == TokenType.TRUE:
+        return { "success": True, "is_primary": True, "value": True }
+    elif token_primary["type"] == TokenType.FALSE:
+        return { "success": True, "is_primary": True, "value": False }
     elif token_primary["type"] == TokenType.FLOAT:
         return { "success": True, "is_primary": True, "value": float(token_primary["value"]) }
     elif token_primary["type"] == TokenType.ID:
@@ -52,7 +56,7 @@ def primary(command: List[Dict], variables: Dict) -> Dict:
             return { "success": False, "message": f"used not declared variable '{token_primary["name"]}'" }
         return { "success": True, "is_primary": True, "value": variables[token_primary["name"]] }
     elif token_primary["type"] == TokenType.OP_PAREN:
-        option_expr = eq_expr(command, variables) 
+        option_expr = logic_expr(command, variables) 
         if not option_expr["success"]:
             return option_expr
 
@@ -177,6 +181,30 @@ def eq_expr(command: List[Dict], variables: Dict) -> Dict:
 
     return expr 
 
+def logic_expr(command: List[Dict], variables: Dict) -> Dict:
+    option_left = eq_expr(command, variables)
+    if not option_left["success"]:
+        return option_left
+    expr: Dict = option_left
+
+    while True:
+        option_op = check_types(command, [
+            TokenType.AND,
+            TokenType.OR
+        ])
+
+        if not option_op["success"]:
+            break
+        token_op: Dict = option_op["token"]
+
+        option_right: Dict = eq_expr(command, variables)
+        if not option_right["success"]:
+            return option_right
+
+        expr: Dict = { "success": True, "is_primary": False, "value": { "op": token_op["type"], "left": expr, "right": option_right } }
+
+    return expr 
+
 def build_tree(command: List[Dict], variables: Dict) -> Dict:
-    res: Dict = eq_expr(command, variables)
+    res: Dict = logic_expr(command, variables)
     return res 

@@ -3,7 +3,6 @@ from numbers import Number
 from typing import Dict, List 
 
 def eval_tree(option_expr: Dict) -> Dict:
-
     if option_expr["is_primary"]:
         return option_expr 
     expression = option_expr["value"] 
@@ -47,5 +46,9 @@ def eval_tree(option_expr: Dict) -> Dict:
         return { "success": True, "value": left != right }
     elif op == TokenType.NEG:
         return { "success": True, "value": not right }
+    elif op == TokenType.AND:
+        return { "success": True, "value": left and right }
+    elif op == TokenType.OR:
+        return { "success": True, "value": left or right }
     else:
         return { "success": False, "message": "unrecognized expression" }
